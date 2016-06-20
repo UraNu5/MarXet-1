@@ -15,7 +15,6 @@ MarXet_Hint_ItemName = "";
 MarXet_Hint_Poptabs = "";
 if !(_vehicleCheck) then
 {
-    // Thx to Exile for logic
     switch (_location) do
     {
         case 0:
@@ -50,6 +49,7 @@ MarXet_Hint_Poptabs = _price;
 _dialog = uiNameSpace getVariable ["RscMarXetDialog", displayNull];
 if !(_dialog isEqualTo displayNull) then
 {
+    ["Sort",MarXet_Sorting] call ExileClient_MarXet_gui_load;
     ["LoadLeft"] call ExileClient_MarXet_gui_load;
     ["LoadRight"] call ExileClient_MarXet_gui_load;
 };

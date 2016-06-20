@@ -6,11 +6,12 @@
 *  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 *  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
 */
-private["_stockArray","_newMoneyString","_location","_vehicleNetID","_itemClassName","_vehicleObject","_name","_containersBefore","_containersAfter","_dialog"];
+private["_stockArray","_newMoneyString","_location","_vehicleNetID","_price","_itemClassName","_sellersUID","_vehicleObject","_name","_containersBefore","_containersAfter","_dialog"];
 _stockArray = _this select 0;
 _newMoneyString = _this select 1;
-_location = _this select 2;
+_location = parseNumber(_this select 2);
 _vehicleNetID = _this select 3;
+_price = parseNumber(_this select 4);
 _itemClassName = (_stockArray select 2) select 0;
 _sellersUID = _stockArray select 4;
 MarXet_Hint_ItemName = "";
@@ -26,20 +27,19 @@ if !(_vehicleNetID isEqualTo "") then
     if (_sellersUID isEqualTo (getplayerUID player)) then
     {
         MarXet_Hint_ItemName = _name;
-        MarXet_Hint_Pincode = ((_stockArray select 2) select 4);
+        MarXet_Hint_Pincode = str(_location);
         [["MarXet","VehicleBoughtSeller"],15,"",15,"",true,true,false,true] call BIS_fnc_advHint;
     }
     else
     {
         MarXet_Hint_ItemName = _name;
-        MarXet_Hint_Poptabs = (parseNumber(_stockArray select 3) * -1);
-        MarXet_Hint_Pincode = ((_stockArray select 2) select 4);
+        MarXet_Hint_Poptabs = _price;
+        MarXet_Hint_Pincode = str(_location);
         [["MarXet","VehicleBought"],15,"",15,"",true,true,false,true] call BIS_fnc_advHint;
     };
 }
 else
 {
-    // Thx to Exile for code logic
     switch (_location) do
 	{
 		case 0:
@@ -71,11 +71,12 @@ else
     }
     else
     {
-        ["ItemPurchasedInformation", [parseNumber(_stockArray select 3) * -1]] call ExileClient_gui_notification_event_addNotification;
+        ["ItemPurchasedInformation", [_price * -1]] call ExileClient_gui_notification_event_addNotification;
     };
     _dialog = uiNameSpace getVariable ["RscMarXetDialog", displayNull];
     if !(_dialog isEqualTo displayNull) then
     {
+        ["Sort",MarXet_Sorting] call ExileClient_MarXet_gui_load;
         ["LoadLeft"] call ExileClient_MarXet_gui_load;
         ["LoadRight"] call ExileClient_MarXet_gui_load;
     };

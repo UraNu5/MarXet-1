@@ -6,7 +6,7 @@
 *  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 *  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
 */
-private["_traders","_trader"];
+private["_traders","_trader","_signs","_sign"];
 _traders = [];
 switch (toLower worldName) do {
 	case "altis":
@@ -23,9 +23,7 @@ switch (toLower worldName) do {
             38.0894
         ]
         call ExileClient_object_trader_create;
-
 		_traders pushBack _trader;
-
 		//////////////////////////////////////////////////////////
         //			 West MarXet Trader
         //////////////////////////////////////////////////////////
@@ -38,12 +36,10 @@ switch (toLower worldName) do {
             113.04
         ]
         call ExileClient_object_trader_create;
-
 		_traders pushBack _trader;
-
 		//////////////////////////////////////////////////////////
         // 			Northern MarXet Trader
-        ////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////
         _trader =
         [
             "Exile_Cutscene_Prisoner01",
@@ -53,16 +49,13 @@ switch (toLower worldName) do {
             332.571
         ]
         call ExileClient_object_trader_create;
-
 		_traders pushBack _trader;
-
 		private ["_signs"];
 		_signs = [
 			["Exile_Sign_Armory",[14577.6,16755.7,0],225.798,[[-0.716886,-0.69719,0],[-0,0,1]],false],
 			["Exile_Sign_Armory",[2986.82,18151.3,0.237748],294.574,[[-0.909421,0.415876,0],[0,0,1]],false],
 			["Exile_Sign_Armory",[23334.3,24201.4,-0.221748],181.915,[[-0.0334147,-0.999442,0],[-0,0,1]],false]
 		];
-
 		{
 			private ["_sign"];
 			_sign = createVehicle [_x select 0, [0,0,0], [], 0, ""];
@@ -76,7 +69,6 @@ switch (toLower worldName) do {
 				_sign setVectorDirAndUp (_x select 3);
 			};
 		} foreach _signs;
-
     };
     case "namalsk":
     {
@@ -92,9 +84,7 @@ switch (toLower worldName) do {
             93.9074
         ]
         call ExileClient_object_trader_create;
-
 		_traders pushBack _trader;
-
 		//////////////////////////////////////////////////////////
 		// 			Northern Boat MarXet Trader
 		//////////////////////////////////////////////////////////
@@ -107,9 +97,7 @@ switch (toLower worldName) do {
             208.937
         ]
         call ExileClient_object_trader_create;
-
 		_traders pushBack _trader;
-
 		//////////////////////////////////////////////////////////
 		// 			Southern Boat MarXet Trader
 		//////////////////////////////////////////////////////////
@@ -122,16 +110,13 @@ switch (toLower worldName) do {
             50.5659
         ]
         call ExileClient_object_trader_create;
-
 		_traders pushBack _trader;
-
 		private ["_signs"];
 		_signs = [
 			["Exile_Sign_Armory",[5017.71,8022.81,0],142.021,[[0.615369,-0.788239,0],[0,-0,1]],false],
 			["Exile_Sign_Armory",[9113.17,10095.6,0.15098],83.7766,[[0.994107,0.108405,0],[0,0,1]],false],
 			["Exile_Sign_Armory",[4353.01,4742.62,0],226.596,[[-0.726524,-0.687141,0],[-0,0,1]],false]
 		];
-
 		{
 			private ["_sign"];
 			_sign = createVehicle [_x select 0, [0,0,0], [], 0, ""];
@@ -145,10 +130,8 @@ switch (toLower worldName) do {
 				_sign setVectorDirAndUp (_x select 3);
 			};
 		} foreach _signs;
-
     };
 };
-
 {
 	_x forceAddUniform "U_BG_Guerilla2_1";
 	_x addVest "Exile_Vest_Snow";
@@ -159,3 +142,4 @@ switch (toLower worldName) do {
 	_x addWeapon "hgun_ACPC2_F";
 	_x addAction ["<img image='\a3\ui_f\data\IGUI\Cfg\Actions\reammo_ca.paa' size='1' shadow='false' />Access MarXet","createDialog 'RscMarXetDialog'","",1,false,true,"","((position player) distance _target) <= 4"];
 } forEach _traders;
+[format["MarXet Traders have been placed. Trader count: %1. Map: %2",(count(_traders)),worldName],"Client Traders"] call ExileClient_MarXet_util_log;

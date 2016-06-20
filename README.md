@@ -10,7 +10,7 @@ MarXet is a server/client script made for Exile to provide a unique and dynamic 
 * Sell any item or any persistent vehicles
 * Accessible via placed MarXet Traders
 * GUI built to match Exile's GUI theme
-* Persistent , saves to the database
+* Persistent, saves to the database
 
 #### Installation
 Installation is simple and easy with only one Exile overwrite.
@@ -43,13 +43,53 @@ Installation is simple and easy with only one Exile overwrite.
                {
                     #include "MarXet\CfgMarXetNetworkMessages.hpp"
                };
-
-4. In your `description.ext` add the following:
+4. At the top of `config.cpp` add `#include "MarXet\CfgMarXet.cpp"`
+4. At the top of `description.ext` add the following:
 
         #include "MarXet\dialog\RscMarXetDefines.hpp"
         #include "MarXet\dialog\RscMarXetDialog.hpp"
 5. You are done! Head on down to configuration.
 
-
 #### Configuration
-MarXet has very little configuration. However, it does have custom traders. Located in `MarXet\` in your `exile.MAPNAME` mission folder, there is a file called `MarXet_Traders.sqf`. The trader setup code is like Exile's, except instead of a setVariable, they have a pushBack. Feel free to add, or remove, or configure as much as you want.
+
+##### Traders and Objects
+Located in `MarXet` folder in your `exile.MAPNAME` mission folder, there is a file called `MarXet_Traders.sqf`.
+The trader setup code is like Exiles', except instead of a setVariable, they have a pushBack.
+
+##### General Config
+The file called `CfgMarXet.cpp`, located in `MarXet\` in your `exile.MAPNAME` mission folder, has a few important system settings in it. Please make sure to read them.
+As MarXet updates and evolves, this file will be the source of 90% of the config options, make sure to continue to check it.
+
+
+#### Changelog
+**Version 2.0 [June 19 2016]**
+* Added ability to sort listings (GUI dropdown)
+* Listings now have a restriction date (Configurable, check CfgMarXet.cpp)
+    * If a listing hasn't been bought in a certain timeline, the database will set the sellersUID to 0, which keeps the seller from making any money on the item
+* Listings that have been restricted will be removed after a certain time (Configurable, check CfgMarXet.cpp)
+* Listing a vehicle will prompt you with a confirmation before listing
+* Purchasing a listed vehicle now requires you to set the pin first
+* Listed vehicles now have a "rekey charge" added onto the list price.
+    * Price is pulled from config.cpp and is the same price as Exile's default rekey price
+    * (If buyer is seller) Buying back listed vehicles will cost just the rekey charge.
+    * (if buyer is seller) Buying back listed vehicles will warn the player that they originally listed that vehicle and it will cost them a rekey charge.
+* Listed items that the player originally listed will show up as 0 or the rekey charge if a vehicle.
+* Added ability for vehicles to spawn on pre-placed helipads (Check CfgMarXet.cpp)
+* Fixed standard sorting filter (It was backwards!)
+* Clean up code a little
+* Probably created more bugs
+
+#### Updating from Version 1.0
+Client, server, exile.ini, and SQL have been updated.
+##### Client
+* Replace MarXet folder with the one from the github
+
+##### Server
+* PBO MarXet_Server from the github
+* Replace one in `@ExileServer\addons`
+
+##### extDB
+* Update your exile.ini with the contents from MarXet-extDB.ini
+
+##### SQL
+* Run MarXet-SQL-upgrade.sql in your favorite mySQL viewer's query window.
