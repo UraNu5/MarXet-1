@@ -26,5 +26,6 @@ class CfgMarXet
             By default this option is 0 because servers will have to manually place the helipads
             Default (0) uses Exile's default position function
         */
+        staticVehicleSpawning = 0;
     };
 };
