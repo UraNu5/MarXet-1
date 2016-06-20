@@ -83,7 +83,7 @@ As MarXet updates and evolves, this file will be the source of 90% of the config
 Client, server, exile.ini, and SQL have been updated.
 ##### Client
 * Replace MarXet folder with the one from the github
-
+* At the top of `config.cpp` add `#include "MarXet\CfgMarXet.cpp"`
 ##### Server
 * PBO MarXet_Server from the github
 * Replace one in `@ExileServer\addons`
