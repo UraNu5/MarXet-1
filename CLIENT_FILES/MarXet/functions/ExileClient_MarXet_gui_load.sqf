@@ -385,6 +385,10 @@ switch (_option) do
                         					throw 0;
                         				};
                                     };
+                                    case 4:
+                                    {
+                                        throw 1;
+                                    };
                                 };
                                 _purchaseBtn ctrlSetText "Purchase";
                                 ctrlEnable [21014,true];
@@ -392,8 +396,15 @@ switch (_option) do
                             }
                             catch
                             {
-                                _purchaseBtn ctrlSetText "NO SPACE";
-                                ctrlEnable [21014,false];
+                                if (_exception isEqualTo 1) then
+                                {
+                                    ctrlEnable [21014,false];
+                                }
+                                else
+                                {
+                                    _purchaseBtn ctrlSetText "NO SPACE";
+                                    ctrlEnable [21014,false];
+                                };
                             };
                         }
                         else
