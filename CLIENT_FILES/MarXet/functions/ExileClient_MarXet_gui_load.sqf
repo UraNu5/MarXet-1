@@ -6,7 +6,6 @@
 *  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 *  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
 */
-private["_option","_display","_rightDropdown","_rightLB","_leftLB","_leftDropdown","_priceEditBox","_pinCodeEditBox","_sortingDropdown","_purchaseBtn","_dropdown","_dropdownOption","_location","_itemsLB","_text","_ClassName","_listingID","_price","_sellersUID","_configName","_type","_name","_index","_vehicleCost","_rekeyCost","_fuel","_health","_sortingOption","_sortDropdown","_playerMoney","_dropdownIndex","_inventoryListBox","_items","_nearVehicles","_className","_canList","_sellerUID","_dataString","_dataArray","_healthText","_fuelText","_pinEditBox","_leftdropdown","_leftdropdownOption","_leftlocation","_itemClassName","_addVeh","_newPinCode","_forbiddenCharacter","_vehicle","_title","_textOption","_confirmBtnText","_cancelBtnText","_titleCtrl","_textCtrl","_confirmBtnCtrl","_cancelBtnCtrl"];
 private ["_option","_display"];
 disableSerialization;
 _option = _this select 0;
@@ -65,6 +64,13 @@ switch (_option) do
         private ["_display","_dropdown","_dropdownOption","_location","_itemsLB"];
         disableSerialization;
         _display = uiNamespace getVariable ["RscMarXetDialog",displayNull];
+        _purchaseBtn = _display displayCtrl 21014;
+        _purchaseBtn ctrlEnable false;
+        _priceEditBox = (_display displayCtrl 21011);
+        _priceEditBox ctrlEnable false;
+        _priceEditBox ctrlSetText "";
+        _title = _display displayCtrl 21009;
+        _title ctrlSetText "";
         _dropdown = _display displayCtrl 21016;
         _dropdownOption = lbCurSel _dropdown;
         _location = _dropdown lbValue _dropdownOption;
@@ -191,6 +197,13 @@ switch (_option) do
         _display = uiNamespace getVariable ["RscMarXetDialog",displayNull];
         _playerMoney = _display displayCtrl 21025;
         _playerMoney ctrlSetStructuredText parseText format["<t valign='middle' align='right' size='0.9' shadow='0'>%1</t>",ExileClientPlayerMoney];
+        _purchaseBtn = _display displayCtrl 21024;
+        _purchaseBtn ctrlEnable false;
+        _priceEditBox = (_display displayCtrl 21011);
+        _priceEditBox ctrlEnable false;
+        _priceEditBox ctrlSetText "";
+        _title = _display displayCtrl 21009;
+        _title ctrlSetText "";
         _dropdown = _display displayCtrl 21019;
         _dropdownIndex = lbCurSel _dropdown;
         _location = _dropdown lbValue _dropdownIndex;
