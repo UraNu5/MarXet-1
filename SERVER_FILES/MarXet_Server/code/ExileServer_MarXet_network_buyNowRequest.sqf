@@ -6,7 +6,7 @@
 *  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 *  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
 */
-private["_sessionID","_package","_listingID","_thatOneThingThatISentToTheServer","_vehicleObject","_buyerIsSeller","_playerObject","_stock","_sellersUID","_buyerUID","_price","_playerMoney","_listingArray","_vehicleClass","_vehicleCost","_rekeyCost","_forbiddenCharacter","_pinCode","_staticVehicleSpawning","_helipad","_position","_hitpoints","_newMoney","_sellerPlayerObject","_sellersMoney","_newSellerMoney","_sellerSessionID"];
+private["_sessionID","_package","_listingID","_thatOneThingThatISentToTheServer","_vehicleObject","_buyerIsSeller","_playerObject","_stock","_sellersUID","_buyerUID","_price","_playerMoney","_listingArray","_vehicleClass","_vehicleCost","_rekeyCost","_forbiddenCharacter","_pinCode","_staticVehicleSpawning","_helipad","_position","_hitpoints","_newMoney","_sellerPlayerObject","_sellersMoney","_newSellerMoney","_sellerSessionID","_count"];
 _sessionID = _this select 0;
 _package = _this select 1;
 _listingID = _package select 0;
@@ -147,18 +147,18 @@ try {
         if (_price > 0) then
         {
             _playerMoney = _playerMoney - _price;
-            _playerObject setVariable ["ExileMoney",_playerMoney];
+            _playerObject setVariable ["ExileMoney",_playerMoney,true];
             format["setAccountMoney:%1:%2",_playerMoney,_buyerUID] call ExileServer_system_database_query_fireAndForget;
         };
-        [_sessionID,"buyerBuyNowResponse",[_stock,str(_playerMoney),_thatOneThingThatISentToTheServer,_vehicleObject,str(_price)]] call ExileServer_system_network_send_to;
+        [_sessionID,"buyerBuyNowResponse",[_stock,_thatOneThingThatISentToTheServer,_vehicleObject,str(_price)]] call ExileServer_system_network_send_to;
         [format["Player: %1 bought their %2 back. Vehicle: %3. Rekey Cost if vehicle: %4",_buyerUID, (_stock select 2) select 0, (_price > 0), _price],"BuyNowRequest"] call ExileServer_MarXet_util_log;
     }
     else
     {
         _newMoney = _playerMoney - _price;
-        _playerObject setVariable ["ExileMoney",_newMoney];
+        _playerObject setVariable ["ExileMoney",_newMoney,true];
         format["setAccountMoney:%1:%2",_newMoney,_buyerUID] call ExileServer_system_database_query_fireAndForget;
-        [_sessionID,"buyerBuyNowResponse",[_stock,str(_newMoney),_thatOneThingThatISentToTheServer,_vehicleObject,str(_price)]] call ExileServer_system_network_send_to;
+        [_sessionID,"buyerBuyNowResponse",[_stock,_thatOneThingThatISentToTheServer,_vehicleObject,str(_price)]] call ExileServer_system_network_send_to;
         _sellerPlayerObject = _sellersUID call ExileServer_MarXet_system_getPlayerObject;
         if (_sellerPlayerObject isEqualTo "") then
         {
@@ -170,12 +170,12 @@ try {
         {
             _sellersMoney = _sellerPlayerObject getVariable ["ExileMoney",0];
             _newSellerMoney = _sellersMoney + _price;
-            _sellerPlayerObject setVariable ["ExileMoney", _newSellerMoney];
+            _sellerPlayerObject setVariable ["ExileMoney", _newSellerMoney,true];
             _sellerSessionID = _sellerPlayerObject getVariable ["ExileSessionID",-1];
             format["setAccountMoney:%1:%2",_newSellerMoney, _sellersUID] call ExileServer_system_database_query_fireAndForget;
             if !(_sellerSessionID isEqualTo -1) then
             {
-                [_sellerSessionID,"sellerBuyNowResponse",[_stock,str(_newSellerMoney)]] call ExileServer_system_network_send_to;
+                [_sellerSessionID,"sellerBuyNowResponse",[_stock]] call ExileServer_system_network_send_to;
             };
         };
         [format["Player: %1 bought player: %2's %3 for %4",_buyerUID,_sellersUID, (_stock select 2) select 0, _price],"BuyNowRequest"] call ExileServer_MarXet_util_log;
@@ -183,6 +183,17 @@ try {
 }
 catch
 {
-    [_sessionID,"notificationRequest", ["Whoops", [_exception]]] call ExileServer_system_network_send_to;
+    [_sessionID, "toastRequest", ["ErrorTitleAndText", ["FAILED!", _exception]]] call ExileServer_system_network_send_to;
     [_exception,"BuyNowRequest"] call ExileServer_MarXet_util_log;
+    if (!isNil "_stock" && !(_stock isEqualTo false)) then
+    {
+        _count = -1;
+        {
+            if ((_x find _listingID) != -1) then
+            {
+                _count = _forEachIndex;
+            };
+        } forEach MarXetInventory;
+        (MarXetInventory select _count) set [1,1];
+    };
 };

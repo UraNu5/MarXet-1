@@ -21,28 +21,21 @@ Installation is simple and easy with only one Exile overwrite.
 3. Copy the contents of `MarXet-extDB.ini` into your `@ExileServer\extDB\sql_custom_v2\exile.ini` file at the bottom.
 
 ##### Server
-1. Copy `ExileServer_system_network_dispatchIncomingMessage.sqf` from `MarXet\SERVER_FILES\exile_server\code` into your `@ExileServer\addons\exile_server\code` folder and replace the existing one.
-    1. This allows MarXet to send network messages to the server. If you run Advanced Banking, Virtual Garage or Most Wanted, you won't need to copy this file over as you already have it. :)
-2. PBO `MarXet_Server` in `SERVER_FILES` and copy that to your `@ExileServer\addons` folder.
+1. PBO `MarXet_Server` in `SERVER_FILES` and copy that to your `@ExileServer\addons` folder.
 
 ##### Client
 1. Copy `MarXet` from `CLIENT_FILES` into the root of your exile.MAPNAME folder.
 2. In either `init.sqf` or `initPlayerLocal.sqf`, add `[] execVM "MarXet\MarXet_Init.sqf";`
-3. `CfgHints.hpp` and `CfgNetworkMessages.hpp` both will depend on your set up.
-    1. If you **ALREADY** have `class CfgHints` or `class CfgNetworkMessages` **ANYWHERE** in your `description.ext` or `config.cpp` in your exile.MAPNAME folder:
+3. `CfgNetworkMessages.hpp` both will depend on your set up.
+    1. If you **ALREADY** have `class CfgNetworkMessages` **ANYWHERE** in your `description.ext` or `config.cpp` in your exile.MAPNAME folder:
         1. Add `#include "MarXet\CfgMarXetNetworkMessages.hpp` to `class CfgNetworkMessages`
-        2. Add `#include "MarXet\CfgMarXetHints.hpp` to `class CfgHints`
-        3. It should look something like what is below.
-    2. If you don't have `class CfgHints` or `class CfgNetworkMessages`, in your `config.cpp`, add this anywhere.
+        2. It should look something like what is below.
+    2. If you don't have `class CfgNetworkMessages`, in your `config.cpp`, add this at the top.
 
-               class CfgHints
-               {
-                    #include "MarXet\CfgMarXetHints.hpp"
-               };
-               class CfgNetworkMessages
-               {
-                    #include "MarXet\CfgMarXetNetworkMessages.hpp"
-               };
+            class CfgNetworkMessages
+            {
+                #include "MarXet\CfgMarXetNetworkMessages.hpp"
+            };
 4. At the top of `config.cpp` add `#include "MarXet\CfgMarXet.cpp"`
 4. At the top of `description.ext` add the following:
 
@@ -62,6 +55,20 @@ As MarXet updates and evolves, this file will be the source of 90% of the config
 
 
 #### Changelog
+**Version 2.2 [June 29 2016]**
+
+Happy Exile update! This is the compatibility patch for Exile version 0.9.8. This patch **WILL NOT** work with any Exile versions before 0.9.8
+* Switched to new Exile money.
+    * Note: Selling and buying both use the "physical" money. Unfortunately, as that lockers are server configurable, the player may lose money if a payment from a sold item went to their locker. I will look into a better way of handling this for version 3.0. If you have an idea, feel free to comment on the forums
+* Switched from CfgHints to Exile's new "toast" notification system.
+* Added checks to make sure CfgMarXet and CfgNetworkMessages exist in the missionConfigFile.
+    * If not, server RPT will be spammed, MarXet won't run and client won't place traders ;)
+* Added ability to disable item restriction and item deletion in database.
+    * Change the settings in CfgMarXet to -1 to disable.
+* "buyNowRequest" no longer keeps the item locked if it reaches an error.
+* Changed MarXet trader parameters to new Exile format
+* Updated CfgNetworkMessages
+
 **Version 2.0 [June 19 2016]**
 * Added ability to sort listings (GUI dropdown)
 * Listings now have a restriction date (Configurable, check CfgMarXet.cpp)
@@ -79,18 +86,14 @@ As MarXet updates and evolves, this file will be the source of 90% of the config
 * Clean up code a little
 * Probably created more bugs
 
-#### Updating from Version 1.0
-Client, server, exile.ini, and SQL have been updated.
+#### Updating to version 2.2 from 2.0
+Client and server have been updated.
 ##### Client
-* Replace MarXet folder with the one from the github
-* At the top of `config.cpp` add `#include "MarXet\CfgMarXet.cpp"`
+* Remove `class CfgHints {};` if MarXet was the only thing in it. Or remove `#include "MarXet\CfgMarXetHints.hpp"`
+* (If you overwrote this via config.cpp) Remove the `ExileServer_system_network_dispatchIncomingMessage` overwrite from config.cpp as that it's included in Exile 0.9.8 by default.
+* Delete `MarXet` folder from Mission folder and copy the one from the github
+* **NOTE:** If you made custom traders for your map, make sure you adjust them for the new format that Exile uses or your traders will not spawn.
 
 ##### Server
-* PBO MarXet_Server from the github
-* Replace one in `@ExileServer\addons`
-
-##### extDB
-* Update your exile.ini with the contents from MarXet-extDB.ini
-
-##### SQL
-* Run MarXet-SQL-upgrade.sql in your favorite mySQL viewer's query window.
+* Delete `MarXet_Server.pbo`
+* PBO `MarXet_Server.pbo` from the github and place it in `@ExileServer\addons` folder.

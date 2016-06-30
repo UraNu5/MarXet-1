@@ -61,7 +61,7 @@ switch (_option) do
     };
     case ("LoadRight"):
     {
-        private ["_display","_dropdown","_dropdownOption","_location","_itemsLB"];
+        private ["_display","_dropdown","_dropdownOption","_location","_itemsLB","_clientMoney"];
         disableSerialization;
         _display = uiNamespace getVariable ["RscMarXetDialog",displayNull];
         _purchaseBtn = _display displayCtrl 21014;
@@ -74,6 +74,7 @@ switch (_option) do
         _dropdown = _display displayCtrl 21016;
         _dropdownOption = lbCurSel _dropdown;
         _location = _dropdown lbValue _dropdownOption;
+        _clientMoney = player getVariable ["ExileMoney",0];
         _itemsLB = (_display displayCtrl 21017);
         lbClear _itemsLB;
         switch (_location) do
@@ -106,7 +107,7 @@ switch (_option) do
                             };
                             _itemsLB lbSetTextRight [_index, format["%1", _price]];
                 	    	_itemsLB lbSetPictureRight [_index, "exile_assets\texture\ui\poptab_trader_ca.paa"];
-                            if (ExileClientPlayerMoney < parseNumber(_price)) then
+                            if (_clientMoney < parseNumber(_price)) then
                             {
                                 lbSetColorRight [21017,_index, [0.8,0,0,1]];
                             };
@@ -144,7 +145,7 @@ switch (_option) do
                             _itemsLB lbSetPicture [_index, getText(configFile >> "CfgVehicles" >> _ClassName >> "picture")];
                             _itemsLB lbSetTextRight [_index, format["%1",_price]];
                             _itemsLB lbSetPictureRight [_index, "exile_assets\texture\ui\poptab_trader_ca.paa"];
-                            if (ExileClientPlayerMoney < parseNumber(_price)) then
+                            if (_clientMoney < parseNumber(_price)) then
                             {
                                 lbSetColorRight [21017,_index, [0.8,0,0,1]];
                             };
@@ -192,11 +193,12 @@ switch (_option) do
     };
     case ("LoadLeft"):
     {
-        private ["_display","_playerMoney","_dropdown","_dropdownIndex","_location","_inventoryListBox","_items","_configName","_name","_index","_text"];
+        private ["_display","_playerMoney","_dropdown","_dropdownIndex","_location","_inventoryListBox","_items","_configName","_name","_index","_text","_clientMoney"];
         disableSerialization;
         _display = uiNamespace getVariable ["RscMarXetDialog",displayNull];
+        _clientMoney = player getVariable ["ExileMoney",0];
         _playerMoney = _display displayCtrl 21025;
-        _playerMoney ctrlSetStructuredText parseText format["<t valign='middle' align='right' size='0.9' shadow='0'>%1</t>",ExileClientPlayerMoney];
+        _playerMoney ctrlSetStructuredText parseText format["<t valign='middle' align='right' size='0.9' shadow='0'>%1</t>",_clientMoney];
         _purchaseBtn = _display displayCtrl 21024;
         _purchaseBtn ctrlEnable false;
         _priceEditBox = (_display displayCtrl 21011);
@@ -292,9 +294,10 @@ switch (_option) do
     };
     case ("LoadCenter"):
     {
-        private ["_display"];
+        private ["_display","_clientMoney"];
         disableSerialization;
         _display = uiNamespace getVariable ["RscMarXetDialog",displayNull];
+        _clientMoney = player getVariable ["ExileMoney", 0];
         _purchaseBtn = _display displayCtrl 21014;
         _purchaseBtn ctrlSetText "Purchase";
         switch (_this select 1) do
@@ -353,7 +356,7 @@ switch (_option) do
                     ctrlSetText [21009,_dataArray select 0];
                     ctrlSetText [21011,_dataArray select 1];
                     _price = parseNumber(_dataArray select 1);
-                    if (ExileClientPlayerMoney < _price) then
+                    if (_clientMoney < _price) then
                     {
                         ctrlEnable [21014,false];
                         _pinEditBox = _display displayCtrl 21032;

@@ -7,7 +7,7 @@ class CfgMarXet
             Restricted means that the seller's UID gets set to 0 so it's no longer owned by the player who sold it
             This keeps players from using MarXet as a long term storage device.
             This value must be LESS THAN the deleteTime
-
+            Set this to -1 to disable
         */
         restrictTime = 5;
 
@@ -15,6 +15,7 @@ class CfgMarXet
             The time in DAYS that a MarXet listing will stay in the database before it gets deleted
             This value only works if it's GREATER THAN the restrictTime.
             The listing must be restricted first before it can get deleted.
+            Set this to -1 to disable
         */
         deleteTime = 15;
     };
