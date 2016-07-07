@@ -172,7 +172,7 @@ try {
             _sellersMoney = _sellerPlayerObject getVariable ["ExileLocker", 0];
             _newSellerMoney = _sellersMoney + _price;
             _sellerSessionID = _sellerPlayerObject getVariable ["ExileSessionID",-1];
-            _sellerPlayerObject getVariable ["ExileLocker",_newSellerMoney,true];
+            _sellerPlayerObject setVariable ["ExileLocker",_newSellerMoney,true];
             format["updateLocker:%1:%2",_newSellerMoney, _sellersUID] call ExileServer_system_database_query_fireAndForget;
             if !(_sellerSessionID isEqualTo -1) then
             {
