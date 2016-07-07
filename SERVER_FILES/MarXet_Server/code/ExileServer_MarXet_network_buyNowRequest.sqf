@@ -6,7 +6,7 @@
 *  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 *  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
 */
-private["_sessionID","_package","_listingID","_thatOneThingThatISentToTheServer","_vehicleObject","_buyerIsSeller","_playerObject","_stock","_sellersUID","_buyerUID","_price","_playerMoney","_listingArray","_vehicleClass","_vehicleCost","_rekeyCost","_forbiddenCharacter","_pinCode","_staticVehicleSpawning","_helipad","_position","_hitpoints","_newMoney","_sellerPlayerObject","_sellersMoney","_newSellerMoney","_sellerSessionID","_count"];
+private["_sessionID","_package","_listingID","_thatOneThingThatISentToTheServer","_vehicleObject","_buyerIsSeller","_playerObject","_stock","_sellersUID","_buyerUID","_price","_playerMoney","_listingArray","_vehicleClass","_vehicleCost","_rekeyCost","_forbiddenCharacter","_pinCode","_staticVehicleSpawning","_helipad","_position","_hitpoints","_newMoney","_sellerPlayerObject","_sellersMoney","_newSellerMoney","_sellerSessionID","_count","_stats"];
 _sessionID = _this select 0;
 _package = _this select 1;
 _listingID = _package select 0;
@@ -162,17 +162,18 @@ try {
         _sellerPlayerObject = _sellersUID call ExileServer_MarXet_system_getPlayerObject;
         if (_sellerPlayerObject isEqualTo "") then
         {
-            _sellersMoney = format["getAccountMoney:%1", _sellersUID] call ExileServer_system_database_query_selectSingleField;
+            _stats = format["getAccountStats:%1", _sellersUID] call ExileServer_system_database_query_selectSingleField;
+            _sellersMoney = _stats select 4;
             _newSellerMoney = _sellersMoney + _price;
-            format["setPlayerMoney:%1:%2",_newSellerMoney, _sellersUID] call ExileServer_system_database_query_fireAndForget;
+            format["updateLocker:%1:%2",_newSellerMoney, _sellersUID] call ExileServer_system_database_query_fireAndForget;
         }
         else
         {
-            _sellersMoney = _sellerPlayerObject getVariable ["ExileMoney",0];
+            _sellersMoney = _sellerPlayerObject getVariable ["ExileLocker", 0];
             _newSellerMoney = _sellersMoney + _price;
-            _sellerPlayerObject setVariable ["ExileMoney", _newSellerMoney,true];
             _sellerSessionID = _sellerPlayerObject getVariable ["ExileSessionID",-1];
-            format["setPlayerMoney:%1:%2",_newSellerMoney, _sellersUID] call ExileServer_system_database_query_fireAndForget;
+            _sellerPlayerObject getVariable ["ExileLocker",_newSellerMoney,true];
+            format["updateLocker:%1:%2",_newSellerMoney, _sellersUID] call ExileServer_system_database_query_fireAndForget;
             if !(_sellerSessionID isEqualTo -1) then
             {
                 [_sellerSessionID,"sellerBuyNowResponse",[_stock]] call ExileServer_system_network_send_to;
