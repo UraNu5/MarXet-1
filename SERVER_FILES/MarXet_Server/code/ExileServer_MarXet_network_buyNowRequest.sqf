@@ -148,7 +148,7 @@ try {
         {
             _playerMoney = _playerMoney - _price;
             _playerObject setVariable ["ExileMoney",_playerMoney,true];
-            format["setPlayerMoney:%1:%2",_playerMoney,_buyerUID] call ExileServer_system_database_query_fireAndForget;
+            format["setPlayerMoney:%1:%2",_playerMoney,_playerObject getVariable ["ExileDatabaseID", 0]] call ExileServer_system_database_query_fireAndForget;
         };
         [_sessionID,"buyerBuyNowResponse",[_stock,_thatOneThingThatISentToTheServer,_vehicleObject,str(_price)]] call ExileServer_system_network_send_to;
         [format["Player: %1 bought their %2 back. Vehicle: %3. Rekey Cost if vehicle: %4",_buyerUID, (_stock select 2) select 0, (_price > 0), _price],"BuyNowRequest"] call ExileServer_MarXet_util_log;
@@ -157,7 +157,7 @@ try {
     {
         _newMoney = _playerMoney - _price;
         _playerObject setVariable ["ExileMoney",_newMoney,true];
-        format["setPlayerMoney:%1:%2",_newMoney,_buyerUID] call ExileServer_system_database_query_fireAndForget;
+        format["setPlayerMoney:%1:%2",_newMoney,_playerObject getVariable ["ExileDatabaseID", 0]] call ExileServer_system_database_query_fireAndForget;
         [_sessionID,"buyerBuyNowResponse",[_stock,_thatOneThingThatISentToTheServer,_vehicleObject,str(_price)]] call ExileServer_system_network_send_to;
         _sellerPlayerObject = _sellersUID call ExileServer_MarXet_system_getPlayerObject;
         if (_sellerPlayerObject isEqualTo "") then
