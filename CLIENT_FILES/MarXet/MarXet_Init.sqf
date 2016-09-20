@@ -3,12 +3,15 @@
 *  MarXet_Init.sqf
 *  Author: WolfkillArcadia
 *  © 2016 Arcas Industries
-*  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
-*  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
+*  This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
+*  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/.
 */
 private["_code"];
 if (!hasInterface || isServer) exitWith {};
+
+// Wait until the server makes this variable public
 waitUntil {!isNil "MarXetLoaded"};
+
 if (MarXetLoaded) then
 {
     {
@@ -25,9 +28,13 @@ if (MarXetLoaded) then
         ['ExileClient_MarXet_util_log','MarXet\functions\ExileClient_MarXet_util_log.sqf'],
         ['ExileClient_MarXet_util_sortNumberString','MarXet\functions\ExileClient_MarXet_util_sortNumberString.sqf']
     ];
+
     [] execVM "MarXet\MarXet_Traders.sqf";
+
     [5, {["updateInventoryRequest",[0]] call ExileClient_system_network_send}, [], false] call ExileClient_system_thread_addtask;
+
     [format["MarXet Client init completed"],"Client Init"] call ExileClient_MarXet_util_log;
+
 }
 else
 {

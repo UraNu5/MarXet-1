@@ -3,8 +3,8 @@
 *  ExileServer_MarXet_inventory_createListingID.sqf
 *  Author: WolfkillArcadia
 *  © 2016 Arcas Industries
-*  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
-*  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
+*  This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
+*  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/.
 */
 private["_numbers","_alpha","_listingID","_generatingListingID"];
 _numbers = "1234567890";

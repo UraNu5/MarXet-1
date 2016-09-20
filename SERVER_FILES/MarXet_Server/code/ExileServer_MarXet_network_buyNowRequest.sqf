@@ -3,8 +3,8 @@
 *  ExileServer_MarXet_network_buyNowRequest.sqf
 *  Author: WolfkillArcadia
 *  © 2016 Arcas Industries
-*  This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
-*  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/.
+*  This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
+*  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/.
 */
 private["_sessionID","_package","_listingID","_thatOneThingThatISentToTheServer","_vehicleObject","_buyerIsSeller","_playerObject","_stock","_sellersUID","_buyerUID","_price","_playerMoney","_listingArray","_vehicleClass","_vehicleCost","_rekeyCost","_forbiddenCharacter","_pinCode","_staticVehicleSpawning","_helipad","_position","_hitpoints","_newMoney","_sellerPlayerObject","_sellersMoney","_newSellerMoney","_sellerSessionID","_count","_stats"];
 _sessionID = _this select 0;
@@ -13,34 +13,51 @@ _listingID = _package select 0;
 _thatOneThingThatISentToTheServer = _package select 1;
 _vehicleObject = "";
 _buyerIsSeller = false;
+
 try {
+    // Perform the usual checks to make sure the player is real.
     _playerObject = _sessionID call ExileServer_system_session_getPlayerObject;
     if (isNull _playerObject) then
-	{
-		throw "Who are you again?";
-	};
+    {
+        throw "Who are you again?";
+    };
+
     if (_listingID isEqualTo "") then
     {
         throw "Listing ID doesn't exist!";
     };
+
+    // Return our stock
     _stock = _listingID call ExileServer_MarXet_inventory_confirmStock;
+
+    // Not available? Shoot, send it back to the client.
     if (_stock isEqualTo false) then
     {
         throw "Oh noes! The item is no longer available!";
     };
+
     _sellersUID = _stock select 4;
     _buyerUID = getPlayerUID _playerObject;
+
+    // Assume the seller is different than the buyer.
     _price = parseNumber(_stock select 3);
+
+    // But we are going to check to make sure anyway, set the price to 0 if they are.
     if (_buyerUID isEqualTo _sellersUID) then
     {
         _price = 0;
         _buyerIsSeller = true;
     };
+
     _playerMoney = _playerObject getVariable ["ExileMoney",0];
+
+    // If vehicle, spawn it in
     if (count(_stock select 2) > 1) then
     {
         _listingArray = _stock select 2;
         _vehicleClass = _listingArray select 0;
+
+        // before anything else, see if they have enough money including the rekeying charge
         _vehicleCost = getNumber (missionConfigFile >> "CfgExileArsenal" >> _vehicleClass >> "price");
         _rekeyCost = _vehicleCost * (getNumber (missionConfigFile >> "CfgTrading" >> "rekeyPriceFactor"));
         if (_buyerIsSeller) then
@@ -51,16 +68,22 @@ try {
         {
             _price = _price + _rekeyCost;
         };
+
         if (_playerMoney < _price) then
         {
             throw "You don't have enough money to purchase";
         };
-    	_forbiddenCharacter = [_thatOneThingThatISentToTheServer, "1234567890"] call ExileClient_util_string_containsForbiddenCharacter;
-    	if !(_forbiddenCharacter isEqualTo -1) then
-    	{
-    		throw format ["Forbidden character in PIN! I have no idea how it got there. [%1]", _forbiddenCharacter];
-    	};
+
+        // Check to see if it's got anything in it that would make the server unhappy
+        _forbiddenCharacter = [_thatOneThingThatISentToTheServer, "1234567890"] call ExileClient_util_string_containsForbiddenCharacter;
+
+        if !(_forbiddenCharacter isEqualTo -1) then
+        {
+            throw format ["Forbidden character in PIN! I have no idea how it got there. [%1]", _forbiddenCharacter];
+        };
         _pinCode = _thatOneThingThatISentToTheServer;
+
+        // Check to see if they preset helipads or not
         _staticVehicleSpawning = (getNumber(missionConfigFile >> "CfgMarXet" >> "Settings" >> "staticVehicleSpawning") isEqualTo 1);
         if (_staticVehicleSpawning) then
         {
@@ -105,32 +128,46 @@ try {
             if (_vehicleClass isKindOf "Ship") then
             {
                 _position = [(getPosATL _playerObject), 80, 10] call ExileClient_util_world_findWaterPosition;
+
                 _vehicleObject = [_vehicleClass, _position, (random 360), false, _pinCode] call ExileServer_object_vehicle_createPersistentVehicle;
             }
             else
             {
                 _position = (getPos _playerObject) findEmptyPosition [10, 175, _vehicleClass];
+
                 if (_position isEqualTo []) then
                 {
                     throw "Couldn't find a suitable position for vehicle";
                 };
+
                 _vehicleObject = [_vehicleClass, _position, (random 360), true, _pinCode] call ExileServer_object_vehicle_createPersistentVehicle;
             };
         };
+
+        // Set ownership
         _vehicleObject setVariable ["ExileOwnerUID", _buyerUID];
         _vehicleObject setVariable ["ExileIsLocked",0];
         _vehicleObject lock 0;
+
+        // Save vehicle in database
         _vehicleObject call ExileServer_object_vehicle_database_insert;
+
+        // Set fuel and damage
         _vehicleObject setFuel (_listingArray select 1);
         _vehicleObject setDamage (_listingArray select 2);
+
+        // Set the hitpoints
         _hitpoints = _listingArray select 3;
+
         if ((typeName _hitpoints) isEqualTo "ARRAY") then
         {
-        	{
-        		_vehicleObject setHitPointDamage [_x select 0, _x select 1];
-        	}
-        	forEach _hitpoints;
+            {
+                _vehicleObject setHitPointDamage [_x select 0, _x select 1];
+            }
+            forEach _hitpoints;
         };
+
+        // update position/stats
         _vehicleObject call ExileServer_object_vehicle_database_update;
         _vehicleObject = netID _vehicleObject;
     }
@@ -141,9 +178,14 @@ try {
             throw "You don't have enough money to purchase the item";
         };
     };
+
+    // Make sure to update our inventory
     _listingID call ExileServer_MarXet_inventory_updateStock;
+
+    // What if we buy our thing back?
     if (_buyerIsSeller) then
     {
+        // Charge the seller the rekey cost of the vehicle
         if (_price > 0) then
         {
             _playerMoney = _playerMoney - _price;
@@ -155,14 +197,22 @@ try {
     }
     else
     {
+        // Looks good, set their account money
         _newMoney = _playerMoney - _price;
         _playerObject setVariable ["ExileMoney",_newMoney,true];
+
+
         format["setPlayerMoney:%1:%2",_newMoney,_playerObject getVariable ["ExileDatabaseID", 0]] call ExileServer_system_database_query_fireAndForget;
+
         [_sessionID,"buyerBuyNowResponse",[_stock,_thatOneThingThatISentToTheServer,_vehicleObject,str(_price)]] call ExileServer_system_network_send_to;
+
+        // Get the seller's player object if they are connected.
         _sellerPlayerObject = _sellersUID call ExileServer_MarXet_system_getPlayerObject;
+
+        // If seller isn't connected, update the database. If they are, process like normal.
         if (_sellerPlayerObject isEqualTo "") then
         {
-            _stats = format["getAccountStats:%1", _sellersUID] call ExileServer_system_database_query_selectSingle;
+            _stats = format["getAccountStats:%1", _sellersUID] call ExileServer_system_database_query_selectSingleField;
             _sellersMoney = _stats select 4;
             _newSellerMoney = _sellersMoney + _price;
             format["updateLocker:%1:%2",_newSellerMoney, _sellersUID] call ExileServer_system_database_query_fireAndForget;
